@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: ifsegment
+Version: 0.0.1
+Summary: Cell segmentation and protein quantification from immunofluorescence images
+Author: Chris Viets
+Project-URL: Homepage, https://github.com/cviets/ifsegment
+Project-URL: Bug Tracker, https://github.com/cviets/ifsegment/issues
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: aicspylibczi>=3.1.1
+Requires-Dist: aicsimageio@ git+https://github.com/cviets/aicsimageio@main
+Requires-Dist: tqdm
