@@ -4,11 +4,15 @@ from glob import glob
 import re
 import tifffile
 import numpy as np
+from typing import List
 
 def read_czi(path_to_file: str) -> AICSImage:
     return AICSImage(path_to_file)
 
-def get_czi_in_folder(path_to_folder):
+def get_czi_in_folder(path_to_folder: str) -> List[str]:
+    """
+    Given a folder path, returns all CZI files in that folder
+    """
     path_to_folder = os.path.expanduser(path_to_folder)
     return glob(os.path.join(path_to_folder, "*.czi"))
 

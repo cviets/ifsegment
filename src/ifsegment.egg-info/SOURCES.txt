@@ -2,6 +2,7 @@ pyproject.toml
 src/ifsegment/__init__.py
 src/ifsegment/cli.py
 src/ifsegment/run_cyto_mask.py
+src/ifsegment/run_mask.py
 src/ifsegment.egg-info/PKG-INFO
 src/ifsegment.egg-info/SOURCES.txt
 src/ifsegment.egg-info/dependency_links.txt
@@ -11,4 +12,6 @@ src/ifsegment.egg-info/top_level.txt
 src/ifsegment/modules/cyto_segment.py
 src/ifsegment/modules/io_utils.py
 src/ifsegment/modules/normalizations.py
+src/ifsegment/modules/nucleus_segment.py
+src/ifsegment/modules/protein_quantification.py
 tests/test_file_io.py

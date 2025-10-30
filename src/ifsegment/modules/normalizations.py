@@ -27,3 +27,10 @@ def minmax_percentile(inp, pmin, pmax):
     max_val = np.percentile(inp, pmax)
     clipped = np.clip(inp, min_val, max_val)
     return minmax(clipped)
+
+def clip_512(inp):
+    if inp.ndim > 2:
+        return np.array([clip_512(elt) for elt in inp])
+    min_val = 512
+    max_val = np.max(inp)
+    return np.clip(inp, min_val, max_val)

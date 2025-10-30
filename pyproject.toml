@@ -15,7 +15,9 @@ dependencies = [
     "numpy",
     "aicspylibczi>=3.1.1",
     "aicsimageio @ git+https://github.com/cviets/aicsimageio@main",
-    "tqdm"
+    "tqdm",
+    "scikit-image",
+    "scipy"
 ]
 
 [project.urls]
