@@ -1,6 +1,6 @@
 import numpy as np
 from .io_utils import read_czi, get_czi_in_folder, write_tiff, get_well_from_file
-from .normalizations import minmax_percentile, clip_512
+from .normalizations import minmax_percentile, clip_512, zstack
 from aicsimageio import AICSImage
 from tqdm import tqdm
 from skimage.morphology import remove_small_objects, remove_small_holes, diamond
@@ -42,17 +42,10 @@ def cyto_segment_array(image: np.ndarray[np.float64]) -> np.ndarray[np.bool_]:
     return mask
 
 def czi_preprocess(czi_image: AICSImage, cyto_channel: int, mode:str="max") -> np.ndarray[np.float64]: 
-    mode = mode.lower()
-    assert mode in {"max", "average", "avg", "mean"}
 
     img_dask = czi_image.get_image_dask_data("ZYX", T=0, C=cyto_channel)
     img_numpy = img_dask.compute()
-
-    # take z-stack
-    if mode == "max":
-        img_numpy = np.max(img_numpy, axis=0)
-    else:
-        img_numpy = np.mean(img_numpy, axis=0)
+    img_numpy = zstack(img_numpy, 0, mode)
     
     # HARD CODED: normalize 0 percentile to -1 and 95 percentile to 1
     img_numpy = clip_512(img_numpy)

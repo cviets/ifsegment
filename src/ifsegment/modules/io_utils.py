@@ -4,10 +4,14 @@ from glob import glob
 import re
 import tifffile
 import numpy as np
-from typing import List
+from typing import List, Union
+import csv
 
 def read_czi(path_to_file: str) -> AICSImage:
     return AICSImage(path_to_file)
+
+def read_tiff(path_to_file: str) -> Union[np.ndarray[np.float64], np.ndarray[np.bool_]]:
+    return tifffile.imread(path_to_file)
 
 def get_czi_in_folder(path_to_folder: str) -> List[str]:
     """
@@ -41,3 +45,25 @@ def write_tiff(data: np.ndarray, output_dir: str, file_name: str) -> None:
         os.mkdir(output_dir)
     full_file = os.path.join(output_dir, file_name+".tiff")
     tifffile.imwrite(full_file, data)
+
+def get_mask_path(path_to_masks, well_name):
+    masks = glob(os.path.join(path_to_masks, "*.tiff"))
+    for mask in masks:
+        head, tail = os.path.split(mask)
+        if well_name in tail:
+            return mask
+        
+    raise FileNotFoundError(f"No mask for well {well_name} found")
+
+def write_to_csv(data, path_to_csv):
+    base, ext = os.path.splitext(path_to_csv)
+    if ext != ".csv":
+        if ext == "" and os.path.isdir(base):
+            path_to_csv = os.path.join(path_to_csv, "ifsegment_data.csv")
+        else:
+            path_to_csv = base + ".csv"
+
+    with open(path_to_csv, newline='', mode='w') as csvfile:
+        writer = csv.writer(csvfile)
+        for row in data:
+            writer.writerow([str(elt) for elt in row])

@@ -1,7 +1,7 @@
 from .cyto_segment import cyto_segment_czi
 from aicsimageio import AICSImage
 import numpy as np
-from .normalizations import minmax_percentile, clip_512
+from .normalizations import minmax_percentile, clip_512, zstack
 from .io_utils import get_czi_in_folder, read_czi, get_well_from_file, write_tiff
 from tqdm import tqdm
 from skimage.measure import label, regionprops
@@ -30,19 +30,12 @@ def nucleus_preprocess(czi_image: AICSImage, nuclear_channel: int, cyto_channel:
     masks : np.ndarray[np.bool_]
         Segmentation array containing cytoplasmic and nuclear masks
     """
-    mode = mode.lower()
-    assert mode in {"max", "average", "avg", "mean"}
 
     cyto_mask = cyto_segment_czi(czi_image, cyto_channel, mode)
 
     img_dask = czi_image.get_image_dask_data("ZYX", T=0, C=nuclear_channel)
     img_numpy = img_dask.compute()
-
-    # take max z stack
-    if mode == "max":
-        img_numpy = np.max(img_numpy, axis=0)
-    else:
-        img_numpy = np.mean(img_numpy, axis=0)
+    img_numpy = zstack(img_numpy, axis=0, mode=mode)
 
     # HARD CODED: normalize 0 percentile to -1 and 98 percentile to 1
     img_numpy = clip_512(img_numpy)

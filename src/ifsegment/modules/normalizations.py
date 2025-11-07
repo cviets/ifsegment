@@ -34,3 +34,15 @@ def clip_512(inp):
     min_val = 512
     max_val = np.max(inp)
     return np.clip(inp, min_val, max_val)
+
+def zstack(image, axis, mode):
+    mode = mode.lower()
+    assert mode in {"max", "average", "avg", "mean"}
+
+    # take z-stack
+    if mode == "max":
+        out = np.max(image, axis=axis)
+    else:
+        out = np.mean(image, axis=axis)
+
+    return out
