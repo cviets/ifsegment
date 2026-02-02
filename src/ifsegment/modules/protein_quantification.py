@@ -27,12 +27,13 @@ def quantify_channels(image: np.ndarray[np.float64], mask: np.ndarray[np.float64
     if image.ndim == 2:
         image = np.expand_dims(image, 0)
 
-    fluor = np.zeros(shape=(len(image), 2))
+    fluor = np.zeros(shape=(len(image), 3))
 
     # compute mean intensities for each channel
     for i, channel in enumerate(image):
-        fluor[i, 0] = np.mean(channel[nuc_mask])
-        fluor[i, 1] = np.mean(channel[cyto_mask])
+        fluor[i, 0] = np.mean(channel[np.logical_or(nuc_mask, cyto_mask)])
+        fluor[i, 1] = np.mean(channel[nuc_mask])
+        fluor[i, 2] = np.mean(channel[cyto_mask])
 
     return fluor
 
@@ -57,8 +58,8 @@ def quantify_folder(path_to_images: str, path_to_masks: str, path_to_save: str, 
     """
     image_paths = get_czi_in_folder(path_to_images)
 
-    # for each channel, we measure nuclear, cytoplasmic, and N/C ratio
-    data = np.zeros(shape=(len(image_paths), 3*len(channels)))
+    # for each channel, we measure total, nuclear, cytoplasmic, and N/C ratio
+    data = np.zeros(shape=(len(image_paths), 1+4*len(channels)),dtype=object)
     
     for idx, image_path in enumerate(tqdm(image_paths, desc="Measuring all images")):
         well_name = get_well_from_file(image_path)
@@ -68,17 +69,21 @@ def quantify_folder(path_to_images: str, path_to_masks: str, path_to_save: str, 
         image_numpy = image_dask.compute()
         image = zstack(image_numpy, 1, mode)
         mask = read_tiff(mask_path)
+        data[idx, 0] = well_name
 
         fluor = quantify_channels(image, mask)
         for idx_j in range(len(channels)):
-            nuclear = fluor[idx_j, 0]
-            cytoplasmic = fluor[idx_j, 1]
-            data[idx, 3*idx_j] = nuclear
-            data[idx, 3*idx_j+1] = cytoplasmic
-            data[idx, 3*idx_j+2] = nuclear/cytoplasmic
+            total = fluor[idx_j, 0]
+            nuclear = fluor[idx_j, 1]
+            cytoplasmic = fluor[idx_j, 2]
+            data[idx, 4*idx_j+1] = total
+            data[idx, 4*idx_j+2] = nuclear
+            data[idx, 4*idx_j+3] = cytoplasmic
+            data[idx, 4*idx_j+4] = nuclear/cytoplasmic
 
-    header = []
+    header = ["Well"]
     for channel in channels:
-        header += ["Ch"+str(channel)+"_N", "Ch"+str(channel)+"_C", "Ch"+str(channel)+"_N/C"]
+        channel_string = "Ch"+str(channel)
+        header += [channel_string+"_TOT", channel_string+"_N", channel_string+"_C", channel_string+"_N/C"]
     data = np.vstack((header, data))
     write_to_csv(data, path_to_save)

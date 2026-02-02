@@ -3,6 +3,7 @@ src/ifsegment/__init__.py
 src/ifsegment/cli.py
 src/ifsegment/run_cyto_mask.py
 src/ifsegment/run_mask.py
+src/ifsegment/run_quant.py
 src/ifsegment.egg-info/PKG-INFO
 src/ifsegment.egg-info/SOURCES.txt
 src/ifsegment.egg-info/dependency_links.txt
