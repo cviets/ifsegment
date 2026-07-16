@@ -18,7 +18,7 @@ def quantify_channels(image: np.ndarray[np.float64], mask: np.ndarray[np.float64
     Returns 
     -----------
     fluor : np.ndarray[np.float64]
-        C-by-2 array containing [nuclear, cytoplasmic] fluorescence for each protein
+        C-by-3 array containing [total, nuclear, cytoplasmic] fluorescence for each protein
     """
     # NOTE: it is important not to modify the pixel values in the image itself since we don't want to mess with the data
     nuc_mask = mask==1
